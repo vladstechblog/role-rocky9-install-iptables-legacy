@@ -1,0 +1,73 @@
+# Generic Linux tasks go here
+- name: Check variable definitions
+  ansible.builtin.assert:
+    that: "{{ var_name }} is defined"
+    msg: "{{ var_name }} is undefined"
+  loop:
+    - gpg_key
+    - gpg_fingerprint
+    - rpm_gpg_dir
+    - gpg_key_dest
+    - epel9_tmp_dir
+    - rpm_src_dir
+    - rpm_package_list
+  loop_control:
+    loop_var: var_name
+
+- name: Copy over EPEL9 GPG key
+  ansible.builtin.copy:
+    src: "{{ gpg_key }}"
+    dest: "{{ gpg_key_dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Import RPM key
+  ansible.builtin.rpm_key:
+    key: "{{ gpg_key_dest }}"
+    fingerprint: "{{ gpg_fingerprint }}"
+    state: present
+
+- name: Create a temp directory
+  ansible.builtin.file:
+    path: "{{ epel9_tmp_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Copy RPM packages
+  ansible.builtin.copy:
+    src: "{{ rpm_src_dir }}/{{ rpm_name }}"
+    dest: "{{ epel9_tmp_dir }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items: "{{ rpm_package_list }}"
+  loop_control:
+    loop_var: rpm_name
+
+- name: Install rpms
+  ansible.builtin.shell: "rpm -i {{ epel9_tmp_dir }}/{{ rpm_name }}"
+  ignore_errors: true
+  register: result
+  failed_when:
+    - "'Failed dependencies' in result.stderr"
+  changed_when:
+    - result.rc == 0
+  with_items: "{{ rpm_package_list }}"
+  loop_control:
+    loop_var: rpm_name
+
+- name: Set iptable and ebtables alternatives to legacy
+  ansible.builtin.shell: "{{ command_to_run }}"
+  with_items:
+    - "/usr/sbin/alternatives --set iptables /usr/sbin/iptables-legacy"
+    - "/usr/sbin/alternatives --set ebtables /usr/sbin/ebtables-legacy"
+  loop_control:
+    loop_var: command_to_run
+
+- name: Remove temp directory
+  ansible.builtin.file:
+    path: "{{ epel9_tmp_dir }}"
+    state: absent

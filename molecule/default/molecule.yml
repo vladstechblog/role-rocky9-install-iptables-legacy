@@ -1,0 +1,10 @@
+---
+driver:
+  name: podman
+platforms:
+  - name: instance
+    image: localhost/myrocky:molecule
+    pre_build_image: true
+    command: /sbin/init
+    volumes:
+    - /sys/fs/cgroup:/sys/fs/cgroup:ro

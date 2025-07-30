@@ -1,0 +1,10 @@
+# test vars
+gpg_key: RPM-GPG-KEY-EPEL-9
+gpg_fingerprint: FF8A D134 4597 106E CE81 3B91 8A38 72BF 3228 467C
+rpm_gpg_dir: /etc/pki/rpm-gpg
+gpg_key_dest: "{{ rpm_gpg_dir }}/{{ gpg_key }}"
+epel9_tmp_dir: /opt/epel9_tmp
+rpm_package_list:
+  - iptables-legacy-libs-1.8.10-11.1.el9.x86_64.rpm
+  - iptables-legacy-1.8.10-11.1.el9.x86_64.rpm
+  - ebtables-legacy-2.0.11-13.el9.x86_64.rpm
