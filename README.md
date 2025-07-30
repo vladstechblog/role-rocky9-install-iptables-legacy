@@ -8,7 +8,7 @@ This role already provides and EPEL9 repo GPG [key](files/RPM-GPG-KEY-EPEL-9)
 Requirements
 ------------
 
-- requuired EPEL9 rpm packages are pre-downloade and stored
+- requuired EPEL9 rpm packages are pre-downloaded and stored
   on the Ansible controller
 
 Role Variables
@@ -37,7 +37,7 @@ Example Playbook
 
   roles:
      - role: role-rocky9-install-iptables-legacy
-       rpm_src_dir: "{{ playbook_dir}}/common_files/epel9 }}"
+       rpm_src_dir: "{{ playbook_dir }}/common_files/epel9"
 ```
 
 
